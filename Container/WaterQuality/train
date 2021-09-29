@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import subprocess
+import json
+
+prefix = '/opt/ml/'
+input_path = os.path.join(prefix,'input/data')
+output_path = os.path.join(prefix, 'output')
+model_path = os.path.join(prefix, 'model')
+param_path = os.path.join(prefix, 'input/config/hyperparameters.json')
+
+# This algorithm has a single channel of input data called 'training'. Since we run in
+# File mode, the input files are copied to the directory specified here.
+channel_name = 'training'
+training_path = os.path.join(input_path, channel_name)
+
+training_script = 'trainingScript.py'
+
+# Execute your training algorithm.
+def _run(cmd):
+    """Invokes your training algorithm."""
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ)
+    stdout, stderr = process.communicate()
+
+    return_code = process.poll()
+    if return_code:
+        error_msg = 'Return Code: {}, CMD: {}, Err: {}'.format(return_code, cmd, stderr)
+        raise Exception(error_msg)
+        
+if __name__=='__main__':
+    try:
+        python_executable = sys.executable
+        train_cmd = [python_executable, training_script]
+
+        _run(train_cmd)
+        print('Training complete.')
+
+        sys.exit(0)
+        
+    except Exception as e:
+        print('Exception during training.')
+        sys.exit(255)   
+    

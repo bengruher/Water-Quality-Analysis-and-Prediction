@@ -1,6 +1,11 @@
-FROM mcr.microsoft.com/azureml/sklearn-0.24.1-ubuntu18.04-py37-cpu-inference:latest
+FROM ubuntu:latest
 
-ENV PATH = "/opt/ml/code:${PATH}"
+RUN apt-get update -y
+RUN apt-get -y install python3-pip
 
-COPY /WaterQuality /opt/ml/code
-WORKDIR /opt/ml/code
+COPY ./WaterQuality/* /opt/ml/code/WaterQuality/
+WORKDIR /opt/ml/code/WaterQuality
+
+RUN pip3 install -r requirements.txt
+
+ENV PATH="/opt/ml/code/WaterQuality:${PATH}"
